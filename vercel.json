@@ -2,9 +2,5 @@
   "rewrites": [
     { "source": "/app", "destination": "/Crwlink.html" },
     { "source": "/", "destination": "/crwlink_landing.html" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
