@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/crwlink_landing.html" },
+    { "source": "/app", "destination": "/Crwlink.html" }
+  ]
+}
