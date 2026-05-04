@@ -533,7 +533,7 @@ function closeFullProfile(){
     <div class="topbar-right">
       <div class="live-badge"><span class="live-dot"></span>3 Live</div>
       <div id="plan-badge" class="plan-badge" style="color:var(--gray);border-color:var(--gray)">Free</div>
-      <div class="avatar" id="topbar-avatar" onclick="toggleAvatarMenu()" style="cursor:pointer" title="Account">SQ</div>
+      <div class="avatar" id="topbar-avatar" onclick="toggleAvatarMenu(event)" style="cursor:pointer" title="Account">SQ</div>
     </div>
   </div>
   <!-- AVATAR DROPDOWN — outside topbar to avoid clipping -->
@@ -1883,7 +1883,8 @@ function copyAIResult(){
 }
 
 // ── GIG FILTER ────────────────────────────────────────────────────────────────
-function toggleAvatarMenu(){
+function toggleAvatarMenu(e){
+  if(e) e.stopPropagation();
   const menu = document.getElementById('avatar-menu');
   menu.style.display = menu.style.display==='none' ? 'block' : 'none';
 }
@@ -1891,7 +1892,7 @@ function toggleAvatarMenu(){
 document.addEventListener('click', function(e){
   const menu = document.getElementById('avatar-menu');
   const avatar = document.getElementById('topbar-avatar');
-  if(menu && !menu.contains(e.target) && e.target !== avatar){
+  if(menu && menu.style.display==='block' && !menu.contains(e.target) && e.target !== avatar){
     menu.style.display = 'none';
   }
 });
