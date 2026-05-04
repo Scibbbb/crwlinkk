@@ -357,7 +357,141 @@ async function loadProfiles(role){
 
 async function openMyProfile(){
   if(!currentUser){ showAuthModal(); return; }
-  showProfileSetup();
+  const { data } = await _supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+  if(data && data.display_name){
+    showFullProfile(data, true);
+  } else {
+    showProfileSetup();
+  }
+}
+
+function showFullProfile(p, isOwn=false){
+  // Build the full page profile
+  const role = p.role || 'creator';
+  const skills = Array.isArray(p.skills) ? p.skills : [];
+  const socials = [
+    p.social_twitch && {icon:'🟣', label:'Twitch', url:`https://twitch.tv/${p.social_twitch}`, color:'#9147ff'},
+    p.social_tiktok && {icon:'⬛', label:'TikTok', url:`https://tiktok.com/@${p.social_tiktok}`, color:'#fff'},
+    p.social_twitter && {icon:'🐦', label:'Twitter', url:`https://twitter.com/${p.social_twitter}`, color:'#1da1f2'},
+    p.social_instagram && {icon:'📸', label:'Instagram', url:`https://instagram.com/${p.social_instagram}`, color:'#e1306c'},
+  ].filter(Boolean);
+
+  const skillTags = skills.map(s=>`<span class="profile-skill">${s}</span>`).join('');
+  const socialBtns = socials.map(s=>`
+    <a href="${s.url}" target="_blank" class="profile-social-btn">
+      <span>${s.icon}</span><span style="color:${s.color}">${s.label}</span>
+    </a>`).join('');
+
+  const statsHTML = role === 'creator' ? `
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--cyan)">${p.avg_ccv?.toLocaleString()||'—'}</div><div class="profile-stat-label">Avg CCV</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--purple)">${p.followers?.toLocaleString()||'—'}</div><div class="profile-stat-label">Followers</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--green)">0</div><div class="profile-stat-label">Brand Deals</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--yellow)">New</div><div class="profile-stat-label">Member</div></div>
+  ` : `
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--cyan)">0</div><div class="profile-stat-label">Gigs Done</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--green)">New</div><div class="profile-stat-label">Rating</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--purple)">${p.location||'—'}</div><div class="profile-stat-label">Location</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" style="color:var(--yellow)">Open</div><div class="profile-stat-label">Availability</div></div>
+  `;
+
+  const initials = (p.display_name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const avatarColor = `linear-gradient(135deg, #6c47ff, #00d4ff)`;
+
+  const html = `
+    <div style="min-height:100vh;background:var(--bg)">
+      <!-- BACK BUTTON -->
+      <div style="position:sticky;top:0;z-index:50;background:rgba(5,6,14,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0.8rem 1.5rem;display:flex;align-items:center;gap:1rem">
+        <button onclick="closeFullProfile()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:0.4rem 0.9rem;border-radius:8px;font-family:var(--font);font-size:0.78rem;font-weight:700;cursor:pointer">← Back</button>
+        <div style="font-family:var(--font);font-size:0.9rem;font-weight:800">${p.display_name||'Profile'}</div>
+        ${isOwn ? `<button onclick="showProfileSetup()" style="margin-left:auto;background:rgba(108,71,255,0.15);border:1px solid rgba(108,71,255,0.3);color:var(--purpleL);padding:0.4rem 0.9rem;border-radius:8px;font-family:var(--font);font-size:0.78rem;font-weight:700;cursor:pointer">✏️ Edit Profile</button>` : ''}
+      </div>
+
+      <!-- BANNER -->
+      <div style="height:180px;background:linear-gradient(135deg,#1a0d3d,#001a2a);position:relative">
+        <div style="position:absolute;bottom:-44px;left:1.5rem;width:88px;height:88px;border-radius:50%;background:${avatarColor};border:4px solid var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:2rem;font-weight:900;color:white">${initials}</div>
+        ${!isOwn ? `
+        <div style="position:absolute;bottom:1rem;right:1.5rem;display:flex;gap:0.5rem">
+          ${role==='crew' ? `
+            <button onclick="bookCrew('${p.display_name}')" style="background:var(--purple);color:white;border:none;padding:0.5rem 1.2rem;border-radius:8px;font-family:var(--font);font-size:0.8rem;font-weight:700;cursor:pointer">📅 Book</button>
+            <button onclick="showToast('💬 Message sent!')" style="background:var(--surface);border:1px solid var(--border2);color:var(--white);padding:0.5rem 1.2rem;border-radius:8px;font-family:var(--font);font-size:0.8rem;font-weight:700;cursor:pointer">💬 Message</button>
+          ` : `
+            <button onclick="requestCollab('${p.display_name}')" style="background:var(--purple);color:white;border:none;padding:0.5rem 1.2rem;border-radius:8px;font-family:var(--font);font-size:0.8rem;font-weight:700;cursor:pointer">🔗 Collab</button>
+            <button onclick="showToast('📺 Invite sent!')" style="background:var(--surface);border:1px solid var(--border2);color:var(--white);padding:0.5rem 1.2rem;border-radius:8px;font-family:var(--font);font-size:0.8rem;font-weight:700;cursor:pointer">📺 Invite</button>
+          `}
+        </div>` : ''}
+      </div>
+
+      <!-- PROFILE BODY -->
+      <div style="padding:3.5rem 1.5rem 3rem;max-width:680px;margin:0 auto">
+
+        <!-- NAME + HANDLE -->
+        <div style="margin-bottom:1rem">
+          <div style="font-family:var(--font);font-size:1.5rem;font-weight:900;margin-bottom:0.2rem">${p.display_name||'—'}</div>
+          <div style="font-size:0.82rem;color:var(--gray);margin-bottom:0.4rem">@${p.username||'—'} · <span style="color:${role==='crew'?'var(--orange)':'var(--cyan)'}">
+            ${role==='crew'?'Crew':'IRL Creator'}
+          </span></div>
+          ${p.location ? `<div style="font-size:0.8rem;color:var(--gray)">📍 ${p.location}</div>` : ''}
+        </div>
+
+        <!-- AVAILABILITY -->
+        <div style="display:inline-flex;align-items:center;gap:0.4rem;background:rgba(0,229,160,0.12);border:1px solid rgba(0,229,160,0.25);color:var(--green);padding:0.3rem 0.8rem;border-radius:99px;font-size:0.72rem;font-weight:700;font-family:var(--font);margin-bottom:1.2rem">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+          ${role==='crew'?'Available for Hire':'Open to Collabs'}
+        </div>
+
+        <!-- BIO -->
+        ${p.bio ? `<p style="font-size:0.88rem;color:var(--grayL);line-height:1.7;margin-bottom:1.5rem">${p.bio}</p>` : '<p style="font-size:0.88rem;color:var(--gray);margin-bottom:1.5rem;font-style:italic">No bio yet.</p>'}
+
+        <!-- SOCIALS -->
+        ${socials.length ? `<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.8rem">${socialBtns}</div>` : ''}
+
+        <!-- STATS -->
+        <div style="margin-bottom:1.8rem">
+          <div style="font-family:var(--font);font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">Stats</div>
+          <div class="profile-stats-grid">${statsHTML}</div>
+        </div>
+
+        <!-- SKILLS -->
+        ${skills.length ? `
+        <div style="margin-bottom:1.8rem">
+          <div style="font-family:var(--font);font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">Skills & Specialties</div>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap">${skillTags}</div>
+        </div>` : ''}
+
+        <!-- PLATFORM -->
+        ${p.platform ? `
+        <div style="margin-bottom:1.8rem">
+          <div style="font-family:var(--font);font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">Platform</div>
+          <div style="background:var(--surface2);border-radius:10px;padding:0.8rem 1rem;display:inline-flex;align-items:center;gap:0.6rem">
+            <span style="font-size:1.2rem">🎥</span>
+            <span style="font-family:var(--font);font-weight:700">${p.platform}</span>
+          </div>
+        </div>` : ''}
+
+        <!-- REVIEWS PLACEHOLDER -->
+        <div style="margin-bottom:1.8rem">
+          <div style="font-family:var(--font);font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">Reviews (0)</div>
+          <div style="background:var(--surface2);border-radius:10px;padding:1.5rem;text-align:center;color:var(--gray);font-size:0.82rem">No reviews yet. Complete your first gig or collab to get reviewed.</div>
+        </div>
+
+        <!-- SHARE -->
+        <button onclick="showToast('🔗 Profile link copied: crwlink.xyz/u/${p.username||'you'}')" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--grayL);padding:0.7rem;border-radius:10px;font-family:var(--font);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border2)'">
+          📤 Share Profile
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Show as full page overlay
+  const overlay = document.getElementById('full-profile-overlay');
+  overlay.innerHTML = html;
+  overlay.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFullProfile(){
+  document.getElementById('full-profile-overlay').style.display = 'none';
+  document.body.style.overflow = '';
 }
 </script>
 </head>
@@ -1390,6 +1524,9 @@ async function openMyProfile(){
   </div>
 </div>
 
+<!-- FULL PROFILE PAGE -->
+<div id="full-profile-overlay" style="display:none;position:fixed;inset:0;z-index:650;background:var(--bg);overflow-y:auto"></div>
+
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-modal" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(5,6,14,0.92);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:1rem">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:420px;padding:2rem;position:relative">
@@ -2097,7 +2234,13 @@ const PROFILES={
   },
 };
 
-function openProfile(id){
+function openProfile(id, supabaseData=null){
+  // If real Supabase data passed, show full page profile
+  if(supabaseData){
+    showFullProfile(supabaseData, false);
+    return;
+  }
+  // Otherwise show demo modal profile
   const p=PROFILES[id];
   if(!p)return;
   const modal=document.getElementById('profile-modal-inner');
