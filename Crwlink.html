@@ -533,7 +533,15 @@ function closeFullProfile(){
     <div class="topbar-right">
       <div class="live-badge"><span class="live-dot"></span>3 Live</div>
       <div id="plan-badge" class="plan-badge" style="color:var(--gray);border-color:var(--gray)">Free</div>
-      <div class="avatar" onclick="openProfile('xnightowl')" style="cursor:pointer" title="View My Profile">SQ</div>
+      <div style="position:relative">
+        <div class="avatar" id="topbar-avatar" onclick="toggleAvatarMenu()" style="cursor:pointer" title="Account">SQ</div>
+        <div id="avatar-menu" style="display:none;position:absolute;top:calc(100% + 0.5rem);right:0;background:var(--surface);border:1px solid var(--border2);border-radius:10px;min-width:160px;z-index:200;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
+          <button onclick="openMyProfile();toggleAvatarMenu()" style="width:100%;padding:0.7rem 1rem;background:none;border:none;color:var(--white);font-family:var(--font);font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:0.5rem;transition:background 0.15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">👤 My Profile</button>
+          <button onclick="showProfileSetup();toggleAvatarMenu()" style="width:100%;padding:0.7rem 1rem;background:none;border:none;color:var(--white);font-family:var(--font);font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:0.5rem;transition:background 0.15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">✏️ Edit Profile</button>
+          <div style="height:1px;background:var(--border);margin:0.2rem 0"></div>
+          <button onclick="handleSignOut();toggleAvatarMenu()" style="width:100%;padding:0.7rem 1rem;background:none;border:none;color:var(--red);font-family:var(--font);font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:0.5rem;transition:background 0.15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">🚪 Sign Out</button>
+        </div>
+      </div>
     </div>
   </div>
   <!-- DASHBOARD -->
@@ -1876,6 +1884,23 @@ function copyAIResult(){
 }
 
 // ── GIG FILTER ────────────────────────────────────────────────────────────────
+function toggleAvatarMenu(){
+  const menu = document.getElementById('avatar-menu');
+  menu.style.display = menu.style.display==='none' ? 'block' : 'none';
+}
+// Close menu when clicking outside
+document.addEventListener('click', function(e){
+  const menu = document.getElementById('avatar-menu');
+  const avatar = document.getElementById('topbar-avatar');
+  if(menu && !menu.contains(e.target) && e.target !== avatar){
+    menu.style.display = 'none';
+  }
+});
+async function handleSignOut(){
+  await signOut();
+  updateAuthUI(false);
+}
+
 // ── AUTH UI ───────────────────────────────────────────────────────────────────
 let selectedRole = 'creator';
 
