@@ -311,6 +311,7 @@ function updateAuthUI(loggedIn){
 async function signUp(email, password, role, displayName){
   const { data, error } = await _supabase.auth.signUp({ email, password });
   if(error){ showToast('❌ ' + error.message); return; }
+  currentUser = data.user;
   // Create profile row
   await _supabase.from('profiles').insert({
     id: data.user.id,
@@ -318,9 +319,9 @@ async function signUp(email, password, role, displayName){
     display_name: displayName,
     role: role
   });
-  showToast('✅ Account created! Check your email to verify.');
+  showToast('✅ Account created! Set up your profile.');
   closeAuthModal();
-  showProfileSetup();
+  setTimeout(()=>{ showProfileSetup(); }, 500);
 }
 
 async function signIn(email, password){
@@ -1790,8 +1791,14 @@ async function handleSignIn(){
   await signIn(email,password);
 }
 async function handleSaveProfile(){
+  if(!currentUser){ 
+    showToast('❌ Please sign in first');
+    closeProfileSetup();
+    showAuthModal();
+    return;
+  }
   const skills=document.getElementById('setup-skills').value.split(',').map(s=>s.trim()).filter(Boolean);
-  await saveProfile({
+  const profileData = {
     display_name:document.getElementById('setup-displayname').value.trim(),
     username:document.getElementById('setup-username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,''),
     bio:document.getElementById('setup-bio').value.trim(),
@@ -1804,7 +1811,9 @@ async function handleSaveProfile(){
     social_tiktok:document.getElementById('setup-tiktok').value.trim(),
     social_twitter:document.getElementById('setup-twitter').value.trim(),
     social_instagram:document.getElementById('setup-instagram').value.trim(),
-  });
+  };
+  showToast('⏳ Saving profile...');
+  await saveProfile(profileData);
 }
 document.addEventListener('DOMContentLoaded',()=>{
   initAuth();
