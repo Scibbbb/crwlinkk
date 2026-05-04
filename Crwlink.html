@@ -357,21 +357,7 @@ async function loadProfiles(role){
 
 async function openMyProfile(){
   if(!currentUser){ showAuthModal(); return; }
-  showToast('⏳ Loading your profile...');
-  // Timeout fallback after 3 seconds
-  const timeout = setTimeout(()=>{ showProfileSetup(); }, 3000);
-  try {
-    const { data } = await _supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-    clearTimeout(timeout);
-    if(data && data.display_name){
-      openProfile(null, data);
-    } else {
-      showProfileSetup();
-    }
-  } catch(e) {
-    clearTimeout(timeout);
-    showProfileSetup();
-  }
+  showProfileSetup();
 }
 </script>
 </head>
