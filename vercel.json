@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/app/profile", "destination": "/Crwlink.html" },
+    { "source": "/app/(.*)", "destination": "/Crwlink.html" },
     { "source": "/app", "destination": "/Crwlink.html" },
     { "source": "/", "destination": "/crwlink_landing.html" }
   ]
