@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Crwlink — The Creator Network for IRL Streamers</title>
+<meta name="description" content="Crwlink is the all-in-one platform for IRL streamers, creators and crew. Rate calculator, gig board, brand deals, AI tools, clip studio and more."/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=Epilogue:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05060e;--surface:#0c0d1a;--surface2:#111220;--surface3:#171828;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --purple:#6c47ff;--purpleL:#9b7fff;--purpleD:#3d2299;
+  --cyan:#00d4ff;--green:#00e5a0;--orange:#ff8c42;
+  --red:#ff4d6d;--yellow:#ffd166;--pink:#ff6eb4;
+  --white:#f0f2ff;--gray:#6a7090;--grayL:#a0a8c0;
+  --font:'Syne',sans-serif;--body:'Epilogue',sans-serif;
+  --glow-purple:0 0 60px rgba(108,71,255,0.25);
+  --glow-cyan:0 0 60px rgba(0,212,255,0.2);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--white);font-family:var(--body);
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,71,255,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(0,212,255,0.06) 0%, transparent 50%);
+}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:0.3;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* GRID PATTERN */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.04;
+  background-image:linear-gradient(rgba(108,71,255,0.5) 1px, transparent 1px),linear-gradient(90deg, rgba(108,71,255,0.5) 1px, transparent 1px);
+  background-size:60px 60px;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:1.1rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,6,14,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-family:var(--font);font-size:1.3rem;font-weight:900;letter-spacing:-0.03em;color:var(--white);text-decoration:none}
+.nav-logo span{color:var(--purple)}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:0.85rem;font-weight:500;color:var(--grayL);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--purple);color:white;padding:0.5rem 1.3rem;border-radius:8px;font-family:var(--font);font-size:0.82rem;font-weight:700;text-decoration:none;transition:all 0.2s;border:1px solid transparent}
+.nav-cta:hover{background:var(--purpleL);transform:translateY(-1px)}
+
+/* SECTIONS */
+section{position:relative;z-index:1}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;
+  padding:8rem 2rem 5rem;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:rgba(108,71,255,0.12);border:1px solid rgba(108,71,255,0.3);
+  color:var(--purpleL);font-size:0.75rem;font-weight:700;font-family:var(--font);
+  padding:0.4rem 1rem;border-radius:99px;margin-bottom:2rem;
+  letter-spacing:0.08em;text-transform:uppercase;
+  animation:fadeDown 0.6s ease both;
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+.hero h1{
+  font-family:var(--font);font-size:clamp(2.8rem,7vw,5.5rem);font-weight:900;
+  line-height:1.0;letter-spacing:-0.04em;margin-bottom:1.5rem;
+  animation:fadeUp 0.7s ease 0.1s both;
+}
+.hero h1 .line-1{display:block;color:var(--white)}
+.hero h1 .line-2{
+  display:block;
+  background:linear-gradient(135deg,var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero h1 .line-3{display:block;color:var(--white)}
+
+.hero-sub{
+  font-size:clamp(1rem,2vw,1.2rem);color:var(--grayL);max-width:560px;line-height:1.7;
+  margin-bottom:3rem;font-weight:400;
+  animation:fadeUp 0.7s ease 0.2s both;
+}
+
+.hero-actions{
+  display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:4rem;
+  animation:fadeUp 0.7s ease 0.3s both;
+}
+.btn-hero-primary{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:var(--purple);color:white;padding:0.85rem 2rem;border-radius:10px;
+  font-family:var(--font);font-size:0.95rem;font-weight:800;text-decoration:none;
+  transition:all 0.2s;box-shadow:0 0 30px rgba(108,71,255,0.4);border:none;cursor:pointer;
+}
+.btn-hero-primary:hover{background:var(--purpleL);transform:translateY(-2px);box-shadow:0 0 40px rgba(108,71,255,0.6)}
+.btn-hero-secondary{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:transparent;color:var(--white);padding:0.85rem 2rem;border-radius:10px;
+  font-family:var(--font);font-size:0.95rem;font-weight:700;text-decoration:none;
+  transition:all 0.2s;border:1px solid var(--border2);cursor:pointer;
+}
+.btn-hero-secondary:hover{background:var(--surface2);border-color:var(--purple);transform:translateY(-2px)}
+
+/* STATS BAR */
+.hero-stats{
+  display:flex;gap:3rem;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp 0.7s ease 0.4s both;
+}
+.hero-stat{text-align:center}
+.hero-stat-num{font-family:var(--font);font-size:1.8rem;font-weight:900;color:var(--white)}
+.hero-stat-label{font-size:0.75rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-top:0.2rem}
+
+/* SCROLL HINT */
+.scroll-hint{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+  color:var(--gray);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;
+  animation:fadeIn 1s ease 1s both;
+}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--purple),transparent);animation:scrollAnim 2s ease infinite}
+@keyframes scrollAnim{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ── FOR WHO ── */
+.for-who{padding:7rem 2rem;max-width:1100px;margin:0 auto}
+.section-label{font-size:0.65rem;font-weight:700;letter-spacing:0.22em;color:var(--purple);text-transform:uppercase;margin-bottom:0.8rem}
+.section-title{font-family:var(--font);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
+.section-sub{font-size:1rem;color:var(--grayL);max-width:520px;line-height:1.7;margin-bottom:3.5rem}
+
+.for-who-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.for-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:2rem;position:relative;overflow:hidden;transition:all 0.25s;
+}
+.for-card::before{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.25s;
+  background:linear-gradient(135deg,rgba(108,71,255,0.06),rgba(0,212,255,0.03));
+}
+.for-card:hover{border-color:rgba(108,71,255,0.4);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
+.for-card:hover::before{opacity:1}
+.for-card-icon{font-size:2.5rem;margin-bottom:1rem}
+.for-card-title{font-family:var(--font);font-size:1.3rem;font-weight:800;margin-bottom:0.5rem}
+.for-card-sub{font-size:0.88rem;color:var(--grayL);line-height:1.65;margin-bottom:1.2rem}
+.for-card-tags{display:flex;gap:0.4rem;flex-wrap:wrap}
+.tag{display:inline-block;padding:0.2rem 0.6rem;border-radius:99px;font-size:0.68rem;font-weight:700;font-family:var(--font)}
+.tag-purple{background:rgba(108,71,255,0.15);color:var(--purpleL);border:1px solid rgba(108,71,255,0.3)}
+.tag-cyan{background:rgba(0,212,255,0.12);color:var(--cyan);border:1px solid rgba(0,212,255,0.25)}
+.tag-green{background:rgba(0,229,160,0.12);color:var(--green);border:1px solid rgba(0,229,160,0.25)}
+.tag-orange{background:rgba(255,140,66,0.12);color:var(--orange);border:1px solid rgba(255,140,66,0.25)}
+.tag-pink{background:rgba(255,110,180,0.12);color:var(--pink);border:1px solid rgba(255,110,180,0.25)}
+
+/* ── FEATURES ── */
+.features{padding:7rem 2rem;background:linear-gradient(to bottom,transparent,rgba(108,71,255,0.04),transparent)}
+.features-inner{max-width:1100px;margin:0 auto}
+.features-header{text-align:center;margin-bottom:4rem}
+.features-header .section-sub{margin:0 auto}
+
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:1.2rem}
+.feat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:1.6rem;transition:all 0.2s;position:relative;overflow:hidden;
+}
+.feat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent-color,var(--purple));opacity:0;transition:opacity 0.2s;
+}
+.feat-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.25);border-color:var(--border2)}
+.feat-card:hover::after{opacity:1}
+.feat-icon{font-size:1.8rem;margin-bottom:0.9rem}
+.feat-title{font-family:var(--font);font-size:0.95rem;font-weight:800;margin-bottom:0.4rem}
+.feat-desc{font-size:0.8rem;color:var(--grayL);line-height:1.65}
+.feat-badge{
+  display:inline-block;margin-top:0.7rem;padding:0.15rem 0.5rem;border-radius:4px;
+  font-size:0.6rem;font-weight:800;font-family:var(--font);letter-spacing:0.06em;
+}
+
+/* ── SOCIAL PROOF ── */
+.proof{padding:7rem 2rem}
+.proof-inner{max-width:1100px;margin:0 auto;text-align:center}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem}
+.proof-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:1.8rem;text-align:left;transition:all 0.2s;
+}
+.proof-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.proof-stars{color:var(--yellow);font-size:0.9rem;margin-bottom:0.8rem;letter-spacing:0.1em}
+.proof-text{font-size:0.88rem;color:var(--grayL);line-height:1.7;margin-bottom:1.2rem;font-style:italic}
+.proof-author{display:flex;align-items:center;gap:0.7rem}
+.proof-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:800;font-size:0.85rem;flex-shrink:0}
+.proof-name{font-family:var(--font);font-size:0.82rem;font-weight:700}
+.proof-handle{font-size:0.72rem;color:var(--gray)}
+
+/* ── PRICING ── */
+.pricing{padding:7rem 2rem}
+.pricing-inner{max-width:1100px;margin:0 auto}
+.pricing-header{text-align:center;margin-bottom:1.5rem}
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:0.8rem;margin-bottom:3.5rem}
+.billing-label{font-size:0.85rem;font-weight:600;color:var(--grayL);transition:color 0.2s}
+.billing-label.active{color:var(--white)}
+.toggle-track{
+  width:44px;height:24px;background:var(--purple);border-radius:99px;
+  cursor:pointer;position:relative;transition:background 0.2s;
+}
+.toggle-knob{
+  width:18px;height:18px;background:white;border-radius:50%;
+  position:absolute;top:3px;left:3px;transition:left 0.2s;
+}
+.toggle-track.annual .toggle-knob{left:23px}
+.save-badge{background:rgba(0,229,160,0.15);color:var(--green);font-size:0.7rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:99px;border:1px solid rgba(0,229,160,0.3)}
+
+.pricing-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}
+.price-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;transition:all 0.2s;
+}
+.price-card.popular{
+  border-color:var(--purple);
+  box-shadow:0 0 40px rgba(108,71,255,0.2);
+  transform:scale(1.03);
+}
+.price-card:hover{transform:translateY(-3px) scale(1.01)}
+.price-card.popular:hover{transform:translateY(-3px) scale(1.04)}
+.price-bar{height:3px}
+.price-body{padding:1.3rem 1.1rem}
+.price-popular-badge{
+  background:var(--purple);color:white;font-size:0.58rem;font-weight:800;
+  padding:0.2rem 0.6rem;border-radius:0 0 6px 6px;font-family:var(--font);
+  text-align:center;letter-spacing:0.06em;
+}
+.price-tier{font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem}
+.price-amount{font-family:var(--font);font-size:2rem;font-weight:900;line-height:1}
+.price-period{font-size:0.7rem;color:var(--gray);margin-bottom:1rem}
+.price-btn{
+  width:100%;padding:0.52rem;border-radius:8px;font-family:var(--font);
+  font-size:0.75rem;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;
+  margin-bottom:0.9rem;
+}
+.price-divider{border:none;border-top:1px solid var(--border);margin:0.8rem 0}
+.price-feature{font-size:0.72rem;color:var(--grayL);padding:0.22rem 0;display:flex;gap:0.4rem;line-height:1.4}
+.price-check{flex-shrink:0;margin-top:0.1rem}
+
+/* ── WAITLIST ── */
+.waitlist{
+  padding:7rem 2rem;
+  background:linear-gradient(135deg,rgba(108,71,255,0.08),rgba(0,212,255,0.04));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.waitlist-inner{max-width:680px;margin:0 auto;text-align:center}
+.waitlist h2{font-family:var(--font);font-size:clamp(2rem,4vw,3rem);font-weight:900;line-height:1.1;margin-bottom:1rem}
+.waitlist p{font-size:1rem;color:var(--grayL);line-height:1.7;margin-bottom:2.5rem}
+.waitlist-form{display:flex;gap:0.7rem;max-width:480px;margin:0 auto 1.5rem}
+.waitlist-input{
+  flex:1;background:var(--surface);border:1px solid var(--border2);color:var(--white);
+  padding:0.85rem 1.1rem;border-radius:10px;font-size:0.9rem;font-family:var(--body);
+  outline:none;transition:border-color 0.2s;
+}
+.waitlist-input:focus{border-color:var(--purple)}
+.waitlist-input::placeholder{color:var(--gray)}
+.waitlist-btn{
+  background:var(--purple);color:white;border:none;padding:0.85rem 1.5rem;
+  border-radius:10px;font-family:var(--font);font-size:0.9rem;font-weight:800;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;
+  box-shadow:0 0 25px rgba(108,71,255,0.4);
+}
+.waitlist-btn:hover{background:var(--purpleL);transform:translateY(-1px)}
+.waitlist-social{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+.waitlist-social-label{font-size:0.78rem;color:var(--gray)}
+.social-link{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  background:var(--surface);border:1px solid var(--border2);
+  color:var(--grayL);padding:0.42rem 0.9rem;border-radius:8px;
+  font-size:0.78rem;font-weight:600;text-decoration:none;transition:all 0.2s;
+}
+.social-link:hover{border-color:var(--purple);color:var(--white);transform:translateY(-1px)}
+.waitlist-count{
+  margin-top:1.2rem;font-size:0.78rem;color:var(--gray);
+  display:flex;align-items:center;justify-content:center;gap:0.5rem;
+}
+.waitlist-avatars{display:flex}
+.waitlist-avatar{
+  width:26px;height:26px;border-radius:50%;border:2px solid var(--bg);
+  margin-left:-8px;font-size:0.6rem;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);font-weight:800;
+}
+.waitlist-avatar:first-child{margin-left:0}
+
+/* ── FAQ ── */
+.faq{padding:7rem 2rem}
+.faq-inner{max-width:740px;margin:0 auto}
+.faq-header{text-align:center;margin-bottom:3.5rem}
+.faq-item{
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:0.7rem;
+  transition:border-color 0.2s;
+}
+.faq-item.open{border-color:rgba(108,71,255,0.4)}
+.faq-q{
+  padding:1.2rem 1.4rem;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;font-family:var(--font);font-size:0.92rem;font-weight:700;gap:1rem;
+  background:var(--surface);transition:background 0.2s;
+}
+.faq-q:hover{background:var(--surface2)}
+.faq-arrow{
+  width:24px;height:24px;border-radius:50%;background:rgba(108,71,255,0.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:0.75rem;transition:transform 0.25s;
+}
+.faq-item.open .faq-arrow{transform:rotate(180deg);background:rgba(108,71,255,0.3)}
+.faq-a{
+  max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.25s;
+  background:var(--surface);
+}
+.faq-a-inner{padding:0 1.4rem 1.2rem;font-size:0.88rem;color:var(--grayL);line-height:1.75;border-top:1px solid var(--border)}
+.faq-item.open .faq-a{max-height:300px}
+
+/* ── FOOTER ── */
+footer{
+  padding:3.5rem 2rem 2rem;
+  border-top:1px solid var(--border);
+  background:rgba(0,0,0,0.2);
+}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.footer-brand-name{font-family:var(--font);font-size:1.4rem;font-weight:900;margin-bottom:0.6rem}
+.footer-brand-name span{color:var(--purple)}
+.footer-brand-desc{font-size:0.82rem;color:var(--gray);line-height:1.7;max-width:240px;margin-bottom:1.2rem}
+.footer-socials{display:flex;gap:0.5rem}
+.footer-social{
+  width:36px;height:36px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:0.85rem;
+  text-decoration:none;color:var(--grayL);transition:all 0.2s;
+}
+.footer-social:hover{border-color:var(--purple);color:var(--white);background:rgba(108,71,255,0.12)}
+.footer-col-title{font-family:var(--font);font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem}
+.footer-col a{display:block;font-size:0.83rem;color:var(--grayL);text-decoration:none;padding:0.25rem 0;transition:color 0.15s}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:2rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem}
+.footer-copy{font-size:0.78rem;color:var(--gray)}
+.footer-legal{display:flex;gap:1.5rem}
+.footer-legal a{font-size:0.78rem;color:var(--gray);text-decoration:none;transition:color 0.15s}
+.footer-legal a:hover{color:var(--grayL)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+.reveal-delay-4{transition-delay:0.4s}
+
+/* SUCCESS STATE */
+.waitlist-success{
+  display:none;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);
+  border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1rem;
+  font-family:var(--font);font-size:0.9rem;font-weight:700;color:var(--green);
+}
+
+/* MOBILE */
+@media(max-width:900px){
+  .for-who-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .proof-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr 1fr;row-gap:1rem}
+  .price-card.popular{transform:none}
+  .footer-top{grid-template-columns:1fr 1fr}
+  nav .nav-links{display:none}
+}
+@media(max-width:600px){
+  .hero h1{font-size:2.5rem}
+  .features-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .waitlist-form{flex-direction:column}
+  .footer-top{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Crw<span>link</span></a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#for-who">Who It's For</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="#waitlist" class="nav-cta">Join Waitlist →</a>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Now in Beta — Join 847 Creators
+  </div>
+  <h1>
+    <span class="line-1">The Platform</span>
+    <span class="line-2">Built for IRL</span>
+    <span class="line-3">Creators & Crew</span>
+  </h1>
+  <p class="hero-sub">
+    Rate calculator. Gig board. Brand deals. AI tools. Clip studio. Academy.
+    Everything a live streamer needs — in one place, finally.
+  </p>
+  <div class="hero-actions">
+    <a href="#waitlist" class="btn-hero-primary">🔗 Join the Waitlist</a>
+    <a href="Crwlink.html" class="btn-hero-secondary">▶ Try the App →</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">847+</div>
+      <div class="hero-stat-label">Creators Joined</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">34</div>
+      <div class="hero-stat-label">Active Gigs</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">$8.4K</div>
+      <div class="hero-stat-label">Paid Out</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">8</div>
+      <div class="hero-stat-label">Brand Deals Live</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    Scroll
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══ FOR WHO ══ -->
+<section id="for-who" style="padding:7rem 2rem">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="reveal">
+      <div class="section-label">Built For You</div>
+      <h2 class="section-title">Whether you're in front of the camera<br>or behind it</h2>
+      <p class="section-sub">Crwlink connects every part of the IRL streaming world — creators, camera ops, editors, tech runners, and the brands that want to work with all of them.</p>
+    </div>
+    <div class="for-who-grid">
+      <div class="for-card reveal reveal-delay-1">
+        <div class="for-card-icon">🎥</div>
+        <div class="for-card-title">IRL & Live Streamers</div>
+        <div class="for-card-sub">You're building something real on Twitch, Kick, or YouTube. Crwlink gives you the tools to monetize it — rate calculator, brand deals, media kit, AI clip tools, and an academy built from real IRL experience.</div>
+        <div class="for-card-tags">
+          <span class="tag tag-purple">Twitch</span>
+          <span class="tag tag-green">Kick</span>
+          <span class="tag tag-pink">YouTube Live</span>
+          <span class="tag tag-orange">TikTok Live</span>
+        </div>
+      </div>
+      <div class="for-card reveal reveal-delay-2">
+        <div class="for-card-icon">📷</div>
+        <div class="for-card-title">Camera Ops & Crew</div>
+        <div class="for-card-sub">You've been grinding gigs with no central place to find work, get paid fairly, or build a reputation. The Crwlink gig board connects you directly to creators looking for your exact skills — locally and remotely.</div>
+        <div class="for-card-tags">
+          <span class="tag tag-cyan">Camera Op</span>
+          <span class="tag tag-cyan">Editor</span>
+          <span class="tag tag-cyan">Tech Runner</span>
+          <span class="tag tag-cyan">Social Manager</span>
+        </div>
+      </div>
+      <div class="for-card reveal reveal-delay-3">
+        <div class="for-card-icon">🤝</div>
+        <div class="for-card-title">Brands & Sponsors</div>
+        <div class="for-card-sub">Stop guessing which creators to sponsor. Crwlink's brand deal board lets you post campaigns and get matched with IRL streamers who actually fit your product — with real verified stats.</div>
+        <div class="for-card-tags">
+          <span class="tag tag-orange">Sponsor</span>
+          <span class="tag tag-orange">Brand Partner</span>
+          <span class="tag tag-orange">Agency</span>
+        </div>
+      </div>
+      <div class="for-card reveal reveal-delay-4">
+        <div class="for-card-icon">🚀</div>
+        <div class="for-card-title">New Creators Starting Out</div>
+        <div class="for-card-sub">No viewers yet? No problem. The Crwlink Academy has 8 free courses covering IRL fundamentals, gear setup, OBS, and how to go from 0 to 1,000 viewers — built by people who've actually done it.</div>
+        <div class="for-card-tags">
+          <span class="tag tag-purple">Free Courses</span>
+          <span class="tag tag-green">Rate Calculator</span>
+          <span class="tag tag-green">Gear Guide</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section id="features" class="features">
+  <div class="features-inner">
+    <div class="features-header reveal">
+      <div class="section-label">Everything In One Place</div>
+      <h2 class="section-title">Stop paying for 6 different tools</h2>
+      <p class="section-sub">Crwlink replaces your rate calculator, clip tool, media kit builder, gig board, and streaming dashboard — all for less than a single subscription.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal reveal-delay-1" style="--accent-color:var(--green)">
+        <div class="feat-icon">💰</div>
+        <div class="feat-title">Rate Calculator</div>
+        <div class="feat-desc">Enter your exact stats — CCV, followers, chat activity, niche, location — and get a full rate card built on real industry CPMs. Works for any size creator.</div>
+        <span class="feat-badge" style="background:rgba(0,229,160,0.12);color:var(--green)">Free</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-2" style="--accent-color:var(--cyan)">
+        <div class="feat-icon">🎥</div>
+        <div class="feat-title">Gig Board</div>
+        <div class="feat-desc">Paid IRL camera gigs, remote editing jobs, tech setup work — posted by real creators. Apply directly through the platform. New gigs every day.</div>
+        <span class="feat-badge" style="background:rgba(0,212,255,0.12);color:var(--cyan)">Crew Plan</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-3" style="--accent-color:var(--yellow)">
+        <div class="feat-icon">🤝</div>
+        <div class="feat-title">Brand Deals</div>
+        <div class="feat-desc">Active brand campaigns from GFuel, SteelSeries, NordVPN and more — posted directly on Crwlink. Apply in one click, no cold emails required.</div>
+        <span class="feat-badge" style="background:rgba(255,209,102,0.12);color:var(--yellow)">Creator Plan</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-1" style="--accent-color:var(--purple)">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">AI Tools Suite</div>
+        <div class="feat-desc">6 Claude-powered tools: stream title generator, caption writer, brand pitch emails, thumbnail concepts, clip hooks, and stream descriptions. Built for streamers.</div>
+        <span class="feat-badge" style="background:rgba(108,71,255,0.12);color:var(--purpleL)">Pro Plan</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-2" style="--accent-color:var(--pink)">
+        <div class="feat-icon">✂️</div>
+        <div class="feat-title">Crwlink Clips</div>
+        <div class="feat-desc">Opus Clip-style AI clip studio. Upload a stream URL and get your top moments auto-detected with captions, viral scores, and vertical formatting ready to post.</div>
+        <span class="feat-badge" style="background:rgba(255,110,180,0.12);color:var(--pink)">Pro Plan</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-3" style="--accent-color:var(--orange)">
+        <div class="feat-icon">🎓</div>
+        <div class="feat-title">Crwlink Academy</div>
+        <div class="feat-desc">8 complete courses covering IRL fundamentals, gear setup, OBS, brand deals, social media, and crew management. AI-generated lesson content, XP system, and certificates.</div>
+        <span class="feat-badge" style="background:rgba(255,140,66,0.12);color:var(--orange)">4 Free Courses</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem">
+      <div class="feat-card reveal" style="--accent-color:var(--cyan)">
+        <div class="feat-icon">✨</div>
+        <div class="feat-title">Media Kit Builder</div>
+        <div class="feat-desc">Live-preview media kit that updates as you type. Share a link or export as a branded PDF to send directly to sponsors.</div>
+        <span class="feat-badge" style="background:rgba(0,212,255,0.12);color:var(--cyan)">Creator Plan</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-1" style="--accent-color:var(--green)">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Analytics Dashboard</div>
+        <div class="feat-desc">Cross-platform follower growth, viewer trends, peak CCV tracking, and estimated brand revenue potential — all in one clean dashboard.</div>
+        <span class="feat-badge" style="background:rgba(0,229,160,0.12);color:var(--green)">Pro Plan</span>
+      </div>
+      <div class="feat-card reveal reveal-delay-2" style="--accent-color:var(--purple)">
+        <div class="feat-icon">🛒</div>
+        <div class="feat-title">Gear Marketplace + AI Kit Builder</div>
+        <div class="feat-desc">Curated IRL streaming gear with real reviews, affiliate deals, and an AI-powered kit builder that recommends your perfect setup for any budget.</div>
+        <span class="feat-badge" style="background:rgba(108,71,255,0.12);color:var(--purpleL)">Free</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOCIAL PROOF ══ -->
+<section class="proof">
+  <div class="proof-inner">
+    <div class="reveal">
+      <div class="section-label" style="text-align:center">What Creators Are Saying</div>
+      <h2 class="section-title" style="text-align:center">Early access. Real results.</h2>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-card reveal reveal-delay-1">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-text">"The rate calculator alone saved me from underselling myself. I was charging $150 for stream sponsorships — Crwlink showed me my real value was $620 based on my actual stats. Game changer."</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:linear-gradient(135deg,#9147ff,#6441a5)">xN</div>
+          <div>
+            <div class="proof-name">xNightOwl</div>
+            <div class="proof-handle">@xnightowl · Twitch IRL Creator · 1.2K avg CCV</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card reveal reveal-delay-2">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-text">"I was doing IRL camera work for $150 flat. Found three gigs on the Crwlink board my first week — $350, $400, and $700. The platform basically paid for itself on the first job."</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:linear-gradient(135deg,#00d4ff,#0080ff)">MK</div>
+          <div>
+            <div class="proof-name">Mike Kowalski</div>
+            <div class="proof-handle">@mikekowalski · IRL Camera Op · LA</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card reveal reveal-delay-3">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-text">"Used the brand pitch email generator to reach out to GFuel. Got a response in 3 days and landed my first real sponsorship deal at $800. The AI tool wrote better than I ever could have."</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:linear-gradient(135deg,#53fc18,#2a8000)">CW</div>
+          <div>
+            <div class="proof-name">CityWalker</div>
+            <div class="proof-handle">@citywalker · Kick IRL Creator · 2.1K avg CCV</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══ -->
+<section id="pricing" class="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-header reveal">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Start free. Grow into Pro.</h2>
+      <p style="font-size:0.95rem;color:var(--grayL);margin-top:0.5rem">No contracts. Cancel anytime. All plans include the rate calculator and live stream browser.</p>
+    </div>
+    <div class="billing-toggle reveal">
+      <span class="billing-label active" id="monthly-label">Monthly</span>
+      <div class="toggle-track" id="billing-toggle" onclick="toggleBilling()">
+        <div class="toggle-knob"></div>
+      </div>
+      <span class="billing-label" id="annual-label">Annual <span class="save-badge">Save 20%</span></span>
+    </div>
+    <div class="pricing-grid reveal">
+      <!-- FREE -->
+      <div class="price-card">
+        <div class="price-bar" style="background:var(--gray)"></div>
+        <div class="price-body">
+          <div class="price-tier" style="color:var(--gray)">Free</div>
+          <div class="price-amount">$0</div>
+          <div class="price-period">forever</div>
+          <button class="price-btn" style="background:var(--surface3);color:var(--white);border:1px solid var(--border2)" onclick="window.open('Crwlink.html')">Get Started</button>
+          <hr class="price-divider">
+          <div class="price-feature"><span class="price-check" style="color:var(--gray)">✓</span>Rate calculator</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--gray)">✓</span>Browse gig board</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--gray)">✓</span>3 brand deal views/mo</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--gray)">✓</span>Live stream browser</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--gray)">✓</span>4 free courses</div>
+        </div>
+      </div>
+      <!-- CREW -->
+      <div class="price-card">
+        <div class="price-bar" style="background:var(--green)"></div>
+        <div class="price-body">
+          <div class="price-tier" style="color:var(--green)">Crew</div>
+          <div class="price-amount" id="price-crew">$14</div>
+          <div class="price-period">/month</div>
+          <button class="price-btn" style="background:rgba(0,229,160,0.15);color:var(--green);border:1px solid rgba(0,229,160,0.4)" onclick="document.getElementById('waitlist-email').focus()">Join Waitlist</button>
+          <hr class="price-divider">
+          <div class="price-feature"><span class="price-check" style="color:var(--green)">✓</span>Full gig board access</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--green)">✓</span>Unlimited job applications</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--green)">✓</span>Featured crew profile</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--green)">✓</span>Direct creator messaging</div>
+        </div>
+      </div>
+      <!-- CREATOR -->
+      <div class="price-card">
+        <div class="price-bar" style="background:var(--cyan)"></div>
+        <div class="price-body">
+          <div class="price-tier" style="color:var(--cyan)">Creator</div>
+          <div class="price-amount" id="price-creator">$19</div>
+          <div class="price-period">/month</div>
+          <button class="price-btn" style="background:rgba(0,212,255,0.15);color:var(--cyan);border:1px solid rgba(0,212,255,0.4)" onclick="document.getElementById('waitlist-email').focus()">Join Waitlist</button>
+          <hr class="price-divider">
+          <div class="price-feature"><span class="price-check" style="color:var(--cyan)">✓</span>Full rate card + PDF export</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--cyan)">✓</span>Media kit builder</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--cyan)">✓</span>Stream health dashboard</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--cyan)">✓</span>5 brand deal apps/mo</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--cyan)">✓</span>Stream scheduler</div>
+        </div>
+      </div>
+      <!-- PRO (POPULAR) -->
+      <div class="price-card popular">
+        <div class="price-popular-badge">MOST POPULAR</div>
+        <div class="price-bar" style="background:var(--purple)"></div>
+        <div class="price-body">
+          <div class="price-tier" style="color:var(--purpleL)">Pro</div>
+          <div class="price-amount" id="price-pro">$49</div>
+          <div class="price-period">/month</div>
+          <button class="price-btn" style="background:var(--purple);color:white;border:none" onclick="document.getElementById('waitlist-email').focus()">⚡ Join Waitlist</button>
+          <hr class="price-divider">
+          <div class="price-feature"><span class="price-check" style="color:var(--purpleL)">✓</span>Everything in Creator</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--purpleL)">✓</span>AI Tools Suite</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--purpleL)">✓</span>Full analytics dashboard</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--purpleL)">✓</span>Crwlink Clips studio</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--purpleL)">✓</span>Unlimited brand deals</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--purpleL)">✓</span>Contract generator</div>
+        </div>
+      </div>
+      <!-- ELITE -->
+      <div class="price-card" style="border-color:rgba(255,140,66,0.25)">
+        <div class="price-bar" style="background:var(--orange)"></div>
+        <div class="price-body">
+          <div class="price-tier" style="color:var(--orange)">Elite</div>
+          <div class="price-amount" id="price-elite">$149</div>
+          <div class="price-period">/month</div>
+          <button class="price-btn" style="background:rgba(255,140,66,0.15);color:var(--orange);border:1px solid rgba(255,140,66,0.4)" onclick="document.getElementById('waitlist-email').focus()">👑 Join Waitlist</button>
+          <hr class="price-divider">
+          <div class="price-feature"><span class="price-check" style="color:var(--orange)">✓</span>Everything in Pro</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--orange)">✓</span>1-on-1 coaching monthly</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--orange)">✓</span>White-glove brand matching</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--orange)">✓</span>Agency services included</div>
+          <div class="price-feature"><span class="price-check" style="color:var(--orange)">✓</span>Verified badge + boost</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WAITLIST ══ -->
+<section id="waitlist" class="waitlist">
+  <div class="waitlist-inner">
+    <div class="reveal">
+      <div class="section-label" style="text-align:center;margin-bottom:1rem">Early Access</div>
+      <h2>Be the first in.<br>Lock in your spot.</h2>
+      <p>Join the waitlist for early access + a free 30-day Pro trial when we launch. No spam. Just the drop.</p>
+      <div class="waitlist-success" id="waitlist-success">
+        🎉 You're on the list! We'll hit you when we launch. Share Crwlink with your crew →
+      </div>
+      <div class="waitlist-form">
+        <input type="email" id="waitlist-email" class="waitlist-input" placeholder="your@email.com"/>
+        <button class="waitlist-btn" onclick="joinWaitlist()">Get Early Access</button>
+      </div>
+      <div class="waitlist-social">
+        <span class="waitlist-social-label">Follow us:</span>
+        <a href="https://instagram.com/crwlink" target="_blank" class="social-link">📸 @crwlink</a>
+        <a href="https://tiktok.com/@crwlink" target="_blank" class="social-link">🎵 @crwlink</a>
+        <a href="https://twitter.com/crwlink" target="_blank" class="social-link">🐦 @crwlink</a>
+      </div>
+      <div class="waitlist-count">
+        <div class="waitlist-avatars">
+          <div class="waitlist-avatar" style="background:linear-gradient(135deg,var(--purple),#9147ff)">xN</div>
+          <div class="waitlist-avatar" style="background:linear-gradient(135deg,var(--cyan),#0080ff)">MK</div>
+          <div class="waitlist-avatar" style="background:linear-gradient(135deg,var(--green),#00804d)">CW</div>
+          <div class="waitlist-avatar" style="background:linear-gradient(135deg,var(--orange),#cc5500)">+</div>
+        </div>
+        <span>847 creators already joined</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section id="faq" class="faq">
+  <div class="faq-inner">
+    <div class="faq-header reveal">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Common questions</h2>
+    </div>
+    <div id="faq-list">
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">What exactly is Crwlink?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Crwlink is an all-in-one platform built specifically for IRL streamers, live creators, and their crew. It replaces a bunch of separate tools — rate calculators, clip editors, media kit builders, gig boards — with one platform built around the actual IRL streaming workflow.</div></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <div class="faq-q" onclick="toggleFaq(this)">Is it only for IRL streamers?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Nope — it works for any live streamer on Twitch, Kick, YouTube, or TikTok, as well as camera operators, clip editors, social media managers, and tech runners who work with streamers. Brands looking to sponsor creators also use the brand deals board.</div></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <div class="faq-q" onclick="toggleFaq(this)">How does the rate calculator work?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">You enter your real stats — average concurrent viewers, platform followers, TikTok audience, chat activity, niche, and location — and Crwlink calculates your rates based on real industry CPM data. It gives you a full rate card with overlay ads, dedicated segments, social post rates, and package deals, plus a monthly estimated brand revenue figure.</div></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-3">
+        <div class="faq-q" onclick="toggleFaq(this)">What's the difference between the free plan and paid plans?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">The free plan gives you the rate calculator, the ability to browse gigs, 3 brand deal views per month, and 4 free courses in the Academy. Paid plans unlock the ability to apply to gigs, create a crew profile, access AI tools, export your media kit, run analytics, use the clip studio, and apply to unlimited brand deals.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">When does Crwlink fully launch?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">We're currently in beta with over 800 early users. The full public launch is coming soon. Join the waitlist and you'll get first access plus a free 30-day Pro trial when we go live.</div></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <div class="faq-q" onclick="toggleFaq(this)">Is this only for big streamers?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Not at all. The rate calculator works from 0 viewers to 500K+. The Academy is specifically built for new creators starting from scratch. And the gig board has work for camera ops and editors at every level — from beginner setups to full IRL productions.</div></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I cancel my plan anytime?<div class="faq-arrow">▾</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Yes — no contracts, no commitments, no cancellation fees. Cancel anytime from your account settings and you keep access until the end of your billing period.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">Crw<span>link</span></div>
+        <p class="footer-brand-desc">The all-in-one creator network for IRL streamers, live creators, and the crew behind them.</p>
+        <div class="footer-socials">
+          <a href="https://instagram.com/crwlink" target="_blank" class="footer-social">📸</a>
+          <a href="https://tiktok.com/@crwlink" target="_blank" class="footer-social">🎵</a>
+          <a href="https://twitter.com/crwlink" target="_blank" class="footer-social">🐦</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <a href="Crwlink.html">Launch App</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#waitlist">Join Waitlist</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">For Creators</div>
+        <a href="#">Rate Calculator</a>
+        <a href="#">Brand Deals</a>
+        <a href="#">Media Kit</a>
+        <a href="#">AI Tools</a>
+        <a href="#">Crwlink Clips</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">For Crew</div>
+        <a href="#">Gig Board</a>
+        <a href="#">Crew Profile</a>
+        <a href="#">Academy</a>
+        <a href="#">Collab Finder</a>
+        <a href="#">Gear Market</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Crwlink. All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// SCROLL REVEAL
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// BILLING TOGGLE
+let isAnnual=false;
+const prices={crew:14,creator:19,pro:49,elite:149};
+function toggleBilling(){
+  isAnnual=!isAnnual;
+  const track=document.getElementById('billing-toggle');
+  track.classList.toggle('annual',isAnnual);
+  document.getElementById('monthly-label').classList.toggle('active',!isAnnual);
+  document.getElementById('annual-label').classList.toggle('active',isAnnual);
+  ['crew','creator','pro','elite'].forEach(p=>{
+    const el=document.getElementById('price-'+p);
+    if(el)el.textContent='$'+(isAnnual?Math.round(prices[p]*0.8):prices[p]);
+  });
+}
+
+// FAQ
+function toggleFaq(el){
+  const item=el.closest('.faq-item');
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+
+// WAITLIST
+function joinWaitlist(){
+  const email=document.getElementById('waitlist-email').value.trim();
+  if(!email||!email.includes('@')){
+    document.getElementById('waitlist-email').style.borderColor='var(--red)';
+    setTimeout(()=>document.getElementById('waitlist-email').style.borderColor='',2000);
+    return;
+  }
+  document.getElementById('waitlist-success').style.display='block';
+  document.querySelector('.waitlist-form').style.display='none';
+  // In production: send to your backend / email service
+  console.log('Waitlist signup:',email);
+}
+
+// Enter key on email
+document.getElementById('waitlist-email').addEventListener('keydown',e=>{
+  if(e.key==='Enter')joinWaitlist();
+});
+
+// SMOOTH NAV LINKS
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+</script>
+</body>
+</html>
