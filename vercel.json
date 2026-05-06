@@ -1,7 +1,12 @@
 {
-  "rewrites": [
-    { "source": "/app", "destination": "/Crwlink.html" },
-    { "source": "/app/profile", "destination": "/Crwlink.html" },
-    { "source": "/", "destination": "/crwlink_landing.html" }
+  "version": 2,
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "api/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/app", "dest": "/Crwlink.html" },
+    { "src": "/app/profile", "dest": "/Crwlink.html" },
+    { "src": "/", "dest": "/crwlink_landing.html" }
   ]
 }
